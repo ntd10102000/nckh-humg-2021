@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Written by impexp-kml-collada-plugin, version "4.2.0" -->
+<!-- Chair of Geoinformatics, Technical University of Munich -->
+<kml xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Document>
+    <name>railwayBuilding_extruded</name>
+    <open>false</open>
+    <Placemark id="KMLExtr_efff6f25-ba36-4a6a-b270-150c30">
+      <name>efff6f25-ba36-4a6a-b270-150c30</name>
+      <styleUrl>#extrudedNormal</styleUrl>
+      <MultiGeometry>
+        <Polygon>
+          <extrude>true</extrude>
+          <tessellate>true</tessellate>
+          <altitudeMode>relativeToGround</altitudeMode>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>13.044344162610342,52.41050399001273,7.259999999999998 13.0443077050927,52.41044565987748,7.259999999999998 13.044471674676144,52.4104068857904,7.259999999999998 13.044487088409129,52.41043138220016,7.259999999999998 13.04446223020005,52.41043722896977,7.259999999999998 13.044483584694044,52.41047134603447,7.259999999999998 13.044521268495972,52.410531539298475,7.259999999999998 13.044546021243795,52.410525744554604,7.259999999999998 13.044573359540003,52.41056985121411,7.259999999999998 13.0445488588414,52.41057558756977,7.259999999999998 13.044586927024827,52.41063640732285,7.259999999999998 13.04460803503791,52.41067011581362,7.259999999999998 13.044632795456696,52.410664473746664,7.259999999999998 13.044647655934243,52.410688862194945,7.259999999999998 13.044483768493484,52.41072742275709,7.259999999999998 13.04444731058964,52.41066909321182,7.259999999999998 13.044344162610342,52.41050399001273,7.259999999999998</coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </MultiGeometry>
+    </Placemark>
+    <Style id="extrudedNormal">
+      <LineStyle>
+        <color>C83366FF</color>
+        <width>1.5</width>
+      </LineStyle>
+      <PolyStyle>
+        <color>C800CCFF</color>
+      </PolyStyle>
+      <BalloonStyle>
+        <text>$[description]</text>
+      </BalloonStyle>
+    </Style>
+  </Document>
+</kml>

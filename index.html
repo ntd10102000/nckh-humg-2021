@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.81/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.81/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link href="index.css" rel="stylesheet" />
+
+</head>
+
+<body style="margin: 0;">
+    <div id="cesiumContainer"></div>
+    <script>
+        // Get your token from https://cesium.com/ion/tokens
+        Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NjFhMzBjOS02YThlLTQ4YjQtYTJlZC1mZjk0ZjJlYjkwNjUiLCJpZCI6NDY0NTEsImlhdCI6MTYxNjE1MjE1OX0.yKaMQt5T-0bNJ2yj-m16X8oYNOIxQTDj6qTu7prxr9U";
+
+        // STEP 4 CODE (replaces steps 2 and 3)
+        // Keep your `Cesium.Ion.defaultAccessToken = 'your_token_here'` line from before here.
+        // STEP 4 CODE (replaces steps 2 and 3)
+        // Keep your `Cesium.Ion.defaultAccessToken = 'your_token_here'` line from before here.
+        var viewer = new Cesium.Viewer("cesiumContainer");
+
+        var promise = Cesium.IonResource.fromAssetId(428229)
+            .then(function(resource) {
+                return Cesium.KmlDataSource.load(resource, {
+                    camera: viewer.scene.camera,
+                    canvas: viewer.scene.canvas
+                });
+            })
+            .then(function(dataSource) {
+                return viewer.dataSources.add(dataSource);
+            })
+            .then(function(dataSource) {
+                return viewer.zoomTo(dataSource);
+            })
+            .otherwise(function(error) {
+                console.log(error);
+            });
+
+        const flightData = JSON.parse(
+            '[{"longitude":105.7724466,"latitude":21.070855,"height":20},{"longitude":105.77246,"latitude":21.0711227,"height":20},{"longitude":105.7725269,"latitude":21.0713059,"height":20},{"longitude":105.7725271,"latitude":21.0713061,"height":20},{"longitude":105.7725271,"latitude":21.0713061,"height":20},{"longitude":105.7732509,"latitude":21.0713074,"height":20},{"longitude":105.7732509,"latitude":21.0713074,"height":20},{"longitude":105.773910,"latitude":21.071552,"height":20},{"longitude":105.774444,"latitude":21.071570,"height":20},{"longitude":105.774750,"latitude":21.071804,"height":20},{"longitude":105.774757,"latitude":21.072181,"height":20},{"longitude":105.774757,"latitude":21.072508,"height":20},{"longitude":105.774707,"latitude":21.072842,"height":20},{"longitude":105.774407,"latitude":21.073040,"height":20},{"longitude":105.774372,"latitude":21.073310,"height":20},{"longitude":105.773911,"latitude":21.073515,"height":20},{"longitude":105.773545,"latitude":21.073522,"height":20},{"longitude":105.773252,"latitude":21.073545,"height":20},{"longitude":105.772885,"latitude":21.073472,"height":20},{"longitude":105.772552,"latitude":21.073330,"height":20},{"longitude":105.772594,"latitude":21.072743,"height":20},{"longitude":105.772615,"latitude":21.072423,"height":20}]'
+        );
+
+        // const duongBoData = JSON.parse(
+        //     '[{"longitude":105.778757,"latitude":21.071494,"height":0},{"longitude":105.777645,"latitude":21.071547,"height":0},{"longitude":105.777119,"latitude":21.071539,"height":0},{"longitude":105.776638,"latitude":21.071556,"height":0},{"longitude":105.775819,"latitude":21.071552,"height":0},{"longitude":105.775194,"latitude":21.071573,"height":0},{"longitude":105.774524,"latitude":21.071569,"height":0},{"longitude":105.773895,"latitude":21.071556,"height":0},{"longitude":105.773891,"latitude":21.071645,"height":0},{"longitude":105.773882,"latitude":21.071751,"height":0},{"longitude":105.773897,"latitude":21.071872,"height":0},{"longitude":105.774045,"latitude":21.071875,"height":0},{"longitude":105.774352,"latitude":21.071915,"height":0},{"longitude":105.774391,"latitude":21.071955,"height":0},{"longitude":105.774346,"latitude":21.072138,"height":0},{"longitude":105.773973,"latitude":21.072166,"height":0},{"longitude":105.773904,"latitude":21.072294,"height":0},{"longitude":105.773834,"latitude":21.072397,"height":0},{"longitude":105.773541,"latitude":21.072481,"height":0},{"longitude":105.773540,"latitude":21.072220,"height":0}]'
+        // );
+
+        /* Initialize the viewer clock:
+  Assume the radar samples are 30 seconds apart, and calculate the entire flight duration based on that assumption.
+  Get the start and stop date times of the flight, where the start is the known flight departure time (converted from PST 
+    to UTC) and the stop is the start plus the calculated duration. (Note that Cesium uses Julian dates. See 
+    https://simple.wikipedia.org/wiki/Julian_day.)
+  Initialize the viewer's clock by setting its start and stop to the flight start and stop times we just calculated. 
+  Also, set the viewer's current time to the start time and take the user to that time. 
+*/
+        const timeStepInSeconds = 100;
+        // const totalSeconds = timeStepInSeconds * (duongBoData.length - 1);
+        const totalSeconds1 = timeStepInSeconds * (flightData.length - 1);
+        const start = Cesium.JulianDate.fromIso8601("2020-03-09T23:10:00Z");
+        // const stop = Cesium.JulianDate.addSeconds(
+        //     start,
+        //     totalSeconds,
+        //     new Cesium.JulianDate()
+        // );
+        const stop = Cesium.JulianDate.addSeconds(
+            start,
+            totalSeconds1,
+            new Cesium.JulianDate()
+        );
+        viewer.clock.startTime = start.clone();
+        viewer.clock.stopTime = stop.clone();
+        viewer.clock.currentTime = start.clone();
+        viewer.timeline.zoomTo(start, stop);
+        // Speed up the playback speed 50x.
+        viewer.clock.multiplier = 50;
+        // Start playing the scene.
+        viewer.clock.shouldAnimate = true;
+
+        // The SampledPositionedProperty stores the position and timestamp for each sample along the radar sample series.
+        const positionProperty = new Cesium.SampledPositionProperty();
+
+        // for (let i = 0; i < duongBoData.length; i++) {
+        //     const dataPoint = duongBoData[i];
+
+        //     // Declare the time for this individual sample and store it in a new JulianDate instance.
+        //     const time = Cesium.JulianDate.addSeconds(
+        //         start,
+        //         i * timeStepInSeconds,
+        //         new Cesium.JulianDate()
+        //     );
+        //     const position = Cesium.Cartesian3.fromDegrees(
+        //         dataPoint.longitude,
+        //         dataPoint.latitude,
+        //         dataPoint.height
+        //     );
+        //     // Store the position along with its timestamp.
+        //     // Here we add the positions all upfront, but these can be added at run-time as samples are received from a server.
+        //     positionProperty.addSample(time, position);
+
+        //     viewer.entities.add({
+        //         description: `Location: (${dataPoint.longitude}, ${dataPoint.latitude}, ${dataPoint.height})`,
+        //         position: position,
+        //         point: {
+        //             pixelSize: 3,
+        //             color: Cesium.Color.WHITE
+        //         }
+        //     });
+        // }
+        for (let i = 0; i < flightData.length; i++) {
+            const dataPoint = flightData[i];
+
+            // Declare the time for this individual sample and store it in a new JulianDate instance.
+            const time = Cesium.JulianDate.addSeconds(
+                start,
+                i * timeStepInSeconds,
+                new Cesium.JulianDate()
+            );
+            const position = Cesium.Cartesian3.fromDegrees(
+                dataPoint.longitude,
+                dataPoint.latitude,
+                dataPoint.height
+            );
+            // Store the position along with its timestamp.
+            // Here we add the positions all upfront, but these can be added at run-time as samples are received from a server.
+            positionProperty.addSample(time, position);
+
+            viewer.entities.add({
+                description: `Location: (${dataPoint.longitude}, ${dataPoint.latitude}, ${dataPoint.height})`,
+                position: position,
+                point: {
+                    pixelSize: 3,
+                    color: Cesium.Color.WHITE
+                }
+            });
+        }
+        // STEP 6 CODE (airplane entity)
+        const airplaneEntity = viewer.entities.add({
+            availability: new Cesium.TimeIntervalCollection([new Cesium.TimeInterval({
+                start: start,
+                stop: stop
+            })]),
+            position: positionProperty,
+            point: {
+                pixelSize: 10,
+                color: Cesium.Color.GREEN
+            },
+            path: new Cesium.PathGraphics({
+                width: 0
+            })
+        });
+
+        // const flightData = JSON.parse(
+        //     '[{"longitude":105.7724466,"latitude":21.070855,"height":20},{"longitude":105.77246,"latitude":21.0711227,"height":20},{"longitude":105.7725269,"latitude":21.0713059,"height":20},{"longitude":105.7725271,"latitude":21.0713061,"height":20},{"longitude":105.7725271,"latitude":21.0713061,"height":20},{"longitude":105.7732509,"latitude":21.0713074,"height":20},{"longitude":105.7732509,"latitude":21.0713074,"height":20},{"longitude":105.773910,"latitude":21.071552,"height":20},{"longitude":105.774444,"latitude":21.071570,"height":20},{"longitude":105.774750,"latitude":21.071804,"height":20},{"longitude":105.774757,"latitude":21.072181,"height":20},{"longitude":105.774757,"latitude":21.072508,"height":20},{"longitude":105.774707,"latitude":21.072842,"height":20},{"longitude":105.774407,"latitude":21.073040,"height":20},{"longitude":105.774372,"latitude":21.073310,"height":20},{"longitude":105.773911,"latitude":21.073515,"height":20},{"longitude":105.773545,"latitude":21.073522,"height":20},{"longitude":105.773252,"latitude":21.073545,"height":20},{"longitude":105.772885,"latitude":21.073472,"height":20},{"longitude":105.772552,"latitude":21.073330,"height":20},{"longitude":105.772594,"latitude":21.072743,"height":20},{"longitude":105.772615,"latitude":21.072423,"height":20}]'
+        // );
+
+        const duongBoData = JSON.parse(
+            '[{"longitude":105.778757,"latitude":21.071494,"height":0},{"longitude":105.777645,"latitude":21.071547,"height":0},{"longitude":105.777119,"latitude":21.071539,"height":0},{"longitude":105.776638,"latitude":21.071556,"height":0},{"longitude":105.775819,"latitude":21.071552,"height":0},{"longitude":105.775194,"latitude":21.071573,"height":0},{"longitude":105.774524,"latitude":21.071569,"height":0},{"longitude":105.773895,"latitude":21.071556,"height":0},{"longitude":105.773891,"latitude":21.071645,"height":0},{"longitude":105.773882,"latitude":21.071751,"height":0},{"longitude":105.773897,"latitude":21.071872,"height":0},{"longitude":105.774045,"latitude":21.071875,"height":0},{"longitude":105.774352,"latitude":21.071915,"height":0},{"longitude":105.774391,"latitude":21.071955,"height":0},{"longitude":105.774346,"latitude":21.072138,"height":0},{"longitude":105.773973,"latitude":21.072166,"height":0},{"longitude":105.773904,"latitude":21.072294,"height":0},{"longitude":105.773834,"latitude":21.072397,"height":0},{"longitude":105.773541,"latitude":21.072481,"height":0},{"longitude":105.773540,"latitude":21.072220,"height":0}]'
+        );
+
+        /* Initialize the viewer clock:
+  Assume the radar samples are 30 seconds apart, and calculate the entire flight duration based on that assumption.
+  Get the start and stop date times of the flight, where the start is the known flight departure time (converted from PST 
+    to UTC) and the stop is the start plus the calculated duration. (Note that Cesium uses Julian dates. See 
+    https://simple.wikipedia.org/wiki/Julian_day.)
+  Initialize the viewer's clock by setting its start and stop to the flight start and stop times we just calculated. 
+  Also, set the viewer's current time to the start time and take the user to that time. 
+*/
+        const timeStepInSeconds1 = 100;
+        // const totalSeconds = timeStepInSeconds * (duongBoData.length - 1);
+        const totalSeconds = timeStepInSeconds1 * (duongBoData.length - 1);
+        const start1 = Cesium.JulianDate.fromIso8601("2020-03-09T23:10:00Z");
+        // const stop = Cesium.JulianDate.addSeconds(
+        //     start,
+        //     totalSeconds,
+        //     new Cesium.JulianDate()
+        // );
+        const stop1 = Cesium.JulianDate.addSeconds(
+            start1,
+            totalSeconds,
+            new Cesium.JulianDate()
+        );
+        viewer.clock.startTime = start1.clone();
+        viewer.clock.stopTime = stop1.clone();
+        viewer.clock.currentTime = start1.clone();
+        viewer.timeline.zoomTo(start1, stop1);
+        // Speed up the playback speed 50x.
+        viewer.clock.multiplier = 50;
+        // Start playing the scene.
+        viewer.clock.shouldAnimate = true;
+
+        // The SampledPositionedProperty stores the position and timestamp for each sample along the radar sample series.
+        const positionProperty1 = new Cesium.SampledPositionProperty();
+
+        // for (let i = 0; i < duongBoData.length; i++) {
+        //     const dataPoint = duongBoData[i];
+
+        //     // Declare the time for this individual sample and store it in a new JulianDate instance.
+        //     const time = Cesium.JulianDate.addSeconds(
+        //         start,
+        //         i * timeStepInSeconds,
+        //         new Cesium.JulianDate()
+        //     );
+        //     const position = Cesium.Cartesian3.fromDegrees(
+        //         dataPoint.longitude,
+        //         dataPoint.latitude,
+        //         dataPoint.height
+        //     );
+        //     // Store the position along with its timestamp.
+        //     // Here we add the positions all upfront, but these can be added at run-time as samples are received from a server.
+        //     positionProperty.addSample(time, position);
+
+        //     viewer.entities.add({
+        //         description: `Location: (${dataPoint.longitude}, ${dataPoint.latitude}, ${dataPoint.height})`,
+        //         position: position,
+        //         point: {
+        //             pixelSize: 3,
+        //             color: Cesium.Color.WHITE
+        //         }
+        //     });
+        // }
+        for (let i = 0; i < duongBoData.length; i++) {
+            const dataPoint1 = duongBoData[i];
+
+            // Declare the time for this individual sample and store it in a new JulianDate instance.
+            const time1 = Cesium.JulianDate.addSeconds(
+                start1,
+                i * timeStepInSeconds1,
+                new Cesium.JulianDate()
+            );
+            const position1 = Cesium.Cartesian3.fromDegrees(
+                dataPoint1.longitude,
+                dataPoint1.latitude,
+                dataPoint1.height
+            );
+            // Store the position along with its timestamp.
+            // Here we add the positions all upfront, but these can be added at run-time as samples are received from a server.
+            positionProperty1.addSample(time1, position1);
+
+            viewer.entities.add({
+                description: `Location: (${dataPoint1.longitude}, ${dataPoint1.latitude}, ${dataPoint1.height})`,
+                position: position1,
+                point: {
+                    pixelSize: 3,
+                    color: Cesium.Color.WHITE
+                }
+            });
+        }
+        // STEP 6 CODE (airplane entity)
+        const airplaneEntity1 = viewer.entities.add({
+            availability: new Cesium.TimeIntervalCollection([new Cesium.TimeInterval({
+                start: start1,
+                stop: stop1
+            })]),
+            position: positionProperty1,
+            point: {
+                pixelSize: 10,
+                color: Cesium.Color.GREEN
+            },
+            path: new Cesium.PathGraphics({
+                width: 0
+            })
+        });
+        // Make the camera track this moving entity.
+        viewer.trackedEntity = airplaneEntity;
+    </script>
+</body>
+
+</html>
